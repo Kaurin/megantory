@@ -8,10 +8,6 @@ type Result struct {
 	ResourceType string
 	ResourceID   string
 	ResourceJSON string
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
 }
 
 // Regions - Provided a map of regionsServices, this returns a slice of regions
@@ -22,3 +18,4 @@ func Regions(regionsServices map[string][]string) []string {
 	}
 	return regions
 }
+
