@@ -18,12 +18,13 @@ var debugShorthand bool
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "megantory",
-	Short: "megantory searches your AWS accounts really fast",
-	Long:  `TODO`,
+	Short: "Search all your configured AWS profiles - FAST",
+	Long: `
+Search all your configured AWS profiles - FAST`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	Run:  searchCmd.Run,  // by default we run the "search" command
-	Args: searchCmd.Args, // inherit searchCmds args rules, too
+	// Run:  searchCmd.Run,  // by default we run the "search" command
+	// Args: searchCmd.Args, // inherit searchCmds args rules, too
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

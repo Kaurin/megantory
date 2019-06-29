@@ -9,11 +9,6 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-func init() {
-	profiles = detectProfiles()
-	regionsServices = getAllRegions()
-}
-
 // detectProfiles finds all our profiles defined in ~/.aws/credentials
 // It will skip profiles called "DEFAULT", but include "default"
 // TODO: if AWS Credentials set in env, then override with that, I guess
