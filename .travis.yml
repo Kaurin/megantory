@@ -5,29 +5,12 @@ env:
   - GO111MODULE=on
 
 
-jobs:
-  include:
-    - stage: "clean"
-      name: "Clean the workspace"
-      script: make clean
-    - stage: "prep"
-      name: "Perform Go Vendoring"
-      script: make prep
-    - stage: "lint"
-      name: "Lint the Code"
-      script: make lint
-    - stage: "test"
-      name: "Test the Code"
-      script: make test
-    - stage: "build"
-      name: "Build the Code"
-      script: make build
-    # - stage: deploy
-    #   name: "Deploy to github"
-    #   deploy:
-    #     provider: pages
-    #     skip_cleanup: true
-    #     github_token: $GITHUB_TOKEN
-    #     keep_history: true
-    #     on:
-    #       branch: master
+deploy:
+  provider: releases
+  skip_cleanup: true
+  file:
+  draft: true
+  on:
+    tags: true
+    branch: cicd
+
