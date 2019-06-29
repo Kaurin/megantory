@@ -15,7 +15,7 @@ var BuildVersion string
 // BuildDate should be injected during build time: -ldflags "-X main.buildDate=$(date -u -Iseconds)"
 var BuildDate string
 
-// BuildGoVersion should be injected during build time: -ldflags "-X main.buildDate=$(go version)"
+// BuildGoVersion should be injected during build time: -ldflags "-X main.buildGoVersion=$(go version)"
 var BuildGoVersion string
 
 // versionCmd represents the version command

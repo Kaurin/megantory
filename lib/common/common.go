@@ -18,4 +18,3 @@ func Regions(regionsServices map[string][]string) []string {
 	}
 	return regions
 }
-
