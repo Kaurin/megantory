@@ -7,10 +7,13 @@ import (
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var logLevel string
+var debugShorthand bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -33,18 +36,14 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initLogrus)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.megantory.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file (default is $HOME/.megantory.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&logLevel, "loglevel", "l", "warn", "Log-level (trace,debug,info,warn,error,fatal,panic)")
+	rootCmd.PersistentFlags().BoolVarP(&debugShorthand, "debug", "d", false, "Shorthand for --loglevel debug. Overrides '--loglevel'")
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
@@ -69,5 +68,31 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+// initLogrus initializes the logging library
+func initLogrus() {
+
+	logLevels := map[string]log.Level{
+		"trace": log.TraceLevel,
+		"debug": log.DebugLevel,
+		"info":  log.InfoLevel,
+		"warn":  log.WarnLevel,
+		"error": log.ErrorLevel,
+		"fatal": log.FatalLevel,
+		"panic": log.PanicLevel,
+	}
+
+	if debugShorthand {
+		logLevel = "debug"
+	}
+	if logLevel == "trace" {
+		log.SetReportCaller(true)
+	}
+	log.SetLevel(logLevels[logLevel])
+	log.Debugf("Log level set to: %v", logLevel)
+	if cfgFile != "" {
+		log.Debugf("Config file set to: %v", cfgFile)
 	}
 }
