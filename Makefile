@@ -2,7 +2,7 @@ buildHash := $(shell git rev-parse HEAD)
 buildVersion := $(shell git describe --tags)
 buildDate := $(shell date -u -Iseconds)
 
-all: clean prep test lint build
+all: clean prep lint test build
 
 clean:
 	rm -rf vendor
