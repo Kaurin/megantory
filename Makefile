@@ -1,4 +1,3 @@
-PKGS := $(shell go list ./...)
 buildHash := $(shell git rev-parse HEAD)
 buildVersion := $(shell git describe --tags)
 buildDate := $(shell date -u -Iseconds)
@@ -12,6 +11,8 @@ clean:
 goclean: clean
 	go clean -cache -testcache -i -x -modcache
 
+prep:
+	go mod vendor
 
 test:
 	go test -mod=vendor
@@ -20,9 +21,6 @@ test:
 lint:
 	go fmt
 	go vet -mod=vendor
-
-prep:
-	go mod vendor
 
 blinux:
 	mkdir -p build
