@@ -3,14 +3,14 @@ buildHash := $(shell git rev-parse HEAD)
 buildVersion := $(shell git describe --tags)
 buildDate := $(shell date -u -Iseconds)
 
-all: goclean clean prep test lint build
+all: goclean prep test lint build
 
 clean:
 	rm -rf vendor
 	rm -rf build
 
-goclean:
-	go clean -cache -testcache -i -x -modcache $(PKGS)
+goclean: clean
+	go clean -cache -testcache -i -x -modcache
 
 
 test:
@@ -18,8 +18,8 @@ test:
 
 
 lint:
-	go fmt $(PKGS)
-	go vet -mod=vendor $(PKGS)
+	go fmt
+	go vet -mod=vendor
 
 prep:
 	go mod vendor
