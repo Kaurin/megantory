@@ -1,6 +1,6 @@
 PKGS := $(shell go list ./...)
 
-all: goclean clean test lint build
+all: goclean clean prep test lint build
 
 clean:
 	rm -rf vendor
