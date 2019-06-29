@@ -1,4 +1,4 @@
-# megantory
+# megantory ![BuildPic]
 
 Search **all** your configured AWS profiles - FAST
 
@@ -36,9 +36,11 @@ megantory help
 megantory search "my search string"
 ```
 
-[GoLang installation]: https://golang.org/doc/install
-[GoLang Environment Variables]: https://github.com/golang/go/wiki/SettingGOPATH
-
 ## Configuration
 
 TODO
+
+
+[GoLang installation]: https://golang.org/doc/install
+[GoLang Environment Variables]: https://github.com/golang/go/wiki/SettingGOPATH
+[BuildPic]: https://travis-ci.com/Kaurin/megantory.svg?branch=master "Master build"
