@@ -8,6 +8,7 @@ type Result struct {
 	ResourceType string
 	ResourceID   string
 	ResourceJSON string
+
 }
 
 // Regions - Provided a map of regionsServices, this returns a slice of regions
