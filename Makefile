@@ -1,5 +1,7 @@
 PKGS := $(shell go list ./...)
 
+all: goclean clean test lint build
+
 clean:
 	rm -rf vendor
 	rm -rf build
@@ -40,8 +42,5 @@ bwindows:
 
 build: blinux bmacos bwindows
 
-
-
-all: goclean clean test lint build
 
 .PHONY: all clean goclean test lint all build blinux bwindows bmacos
