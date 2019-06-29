@@ -16,6 +16,8 @@ var regionsServices map[string][]string
 
 // Search searches all accounts and all supported services in all regions
 func Search(input string) {
+	profiles = detectProfiles()
+	regionsServices = getAllRegions()
 	log.Infoln("Starting the Search LIB")
 	searchEc2(input)
 }

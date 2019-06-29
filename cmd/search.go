@@ -11,13 +11,16 @@ import (
 // searchCmd represents the search command
 var searchCmd = &cobra.Command{
 	Use:   "search",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Searches all the things",
+	Long: `
+* Groks your AWS credentials file for all the profiles defined therein
+* Performs a free-text search against all profiles / regions / supported services
+* Does all the searches mentioned above and processing with a high degree of concurrency
+* Returns a list of found resources with breadcrumbs where to find them
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Example: megantory search "foobar"
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Infoln("Starting the Search CMD")
 		search.Search(strings.Join(args, " "))
