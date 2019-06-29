@@ -15,6 +15,9 @@ var BuildVersion string
 // BuildDate should be injected during build time: -ldflags "-X main.buildDate=$(date -u -Iseconds)"
 var BuildDate string
 
+// BuildGoVersion should be injected during build time: -ldflags "-X main.buildDate=$(go version)"
+var BuildGoVersion string
+
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
@@ -24,6 +27,7 @@ var versionCmd = &cobra.Command{
 		fmt.Printf("Version: %s\n", BuildVersion)
 		fmt.Printf("Git Hash: %s\n", BuildHash)
 		fmt.Printf("Build Date: %s\n", BuildDate)
+		fmt.Printf("Builder Go version: %s\n", BuildGoVersion)
 	},
 }
 

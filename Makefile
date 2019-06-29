@@ -16,28 +16,35 @@ lint:
 	go fmt $(PKGS)
 	go vet $(PKGS)
 
+
+prep:
+	go mod vendor
+
 blinux:
 	mkdir -p build
-	GOOS=linux go build -ldflags \
+	GOOS=linux go build -mod vendor -ldflags \
 		"-X main.buildHash=$$(git rev-parse HEAD) \
 		-X main.buildVersion=$$(git describe --tags) \
 		-X main.buildDate=$$(date -u -Iseconds)" \
+		-X main.buildGoInfo=$$(go version)" \
 			-o build/megantory.linux
 
 bmacos:
 	mkdir -p build
-	GOOS=darwin go build -ldflags \
+	GOOS=darwin go build -mod vendor -ldflags \
 		"-X main.buildHash=$$(git rev-parse HEAD) \
 		-X main.buildVersion=$$(git describe --tags) \
 		-X main.buildDate=$$(date -u -Iseconds)" \
+		-X main.buildGoInfo=$$(go version)" \
 			-o build/megantory.macos
 
 bwindows:
 	mkdir -p build
-	GOOS=windows go build -ldflags \
+	GOOS=windows go build -mod vendor -ldflags \
 		"-X main.buildHash=$$(git rev-parse HEAD) \
 		-X main.buildVersion=$$(git describe --tags) \
 		-X main.buildDate=$$(date -u -Iseconds)" \
+		-X main.buildGoInfo=$$(go version)" \
 			-o build/megantory.windows
 
 build: blinux bmacos bwindows
