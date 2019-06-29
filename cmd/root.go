@@ -45,6 +45,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "loglevel", "l", "warn", "Log-level (trace,debug,info,warn,error,fatal,panic)")
 	rootCmd.PersistentFlags().BoolVarP(&debugShorthand, "debug", "d", false, "Shorthand for --loglevel debug. Overrides '--loglevel'")
 
+}
+
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
