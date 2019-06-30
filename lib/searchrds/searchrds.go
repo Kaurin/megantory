@@ -1,16 +1,16 @@
-package searchec2
+package searchrds
 
 import (
 	"sync"
 
 	"github.com/Kaurin/megantory/lib/common"
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
 )
 
-type funcResources []func(ec2Input)
+type funcResources []func(rdsInput)
 
-type ec2Input struct {
-	client    *ec2.Client
+type rdsInput struct {
+	client    *rds.Client
 	parentWg  *sync.WaitGroup
 	profile   string
 	searchStr string
@@ -18,20 +18,19 @@ type ec2Input struct {
 	cResult   chan common.Result
 }
 
-// Search through all supported EC2 resource types
+// Search through all supported RDS resource types
 func Search(ssi common.SubSearchInput) {
-	if !common.ServiceInRegion(ssi.RegionsVServices, ssi.Profile, ssi.Region, "ec2") {
+	if !common.ServiceInRegion(ssi.RegionsVServices, ssi.Profile, ssi.Region, "rds") {
 		ssi.ParentWg.Done()
 		return
 	}
 	wg := sync.WaitGroup{}
 	fResources := funcResources{
-		searchInstances,
-		searchAddresses,
+		searchClusters,
 	}
-	client := ec2.New(ssi.Config)
+	client := rds.New(ssi.Config)
 	for _, f := range fResources {
-		ec2i := ec2Input{
+		rdsi := rdsInput{
 			client:    client,
 			parentWg:  &wg,
 			profile:   ssi.Profile,
@@ -40,7 +39,7 @@ func Search(ssi common.SubSearchInput) {
 			cResult:   ssi.CResult,
 		}
 		wg.Add(1)
-		go f(ec2i)
+		go f(rdsi)
 	}
 	wg.Wait()
 	ssi.ParentWg.Done()
