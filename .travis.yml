@@ -8,11 +8,10 @@ deploy:
   overwrite: true
   prerelease: true
   skip_cleanup: true
-  draft: true
   api_key:
     secure: Bm0yyta7nQAs8mXtXH0SRxPlb94TQptbZ1mu5ePw6uaRcobtFlsS948J/rH/r4x4kBA3/8ppNMOyJjVL+tyfXvU/s773FfMUU5PG/9FsktSQLVL9tEofTGx4c27UHgexvh7fWEJAglOV0mpTl8KzBp4isK5oZ1Mc3ftGYjDutRI7xns76BzlnKyiZuMqnPO44RxaHdlyVOsl1oeVOUHgqfTg2/jDSgRZOKuHrGC7DGDy2JCGvsmPCMgqqzwVVt1n4B+lsKiWn2FBiHaixvMPZMrd1eFg4r3GO2v9mQ3sBlWzn0HPzz6gwkCwxLeAYjiLwfWBwDf0Vzu29Lls5bV4rHt/lOEXt8TVq7ef5oEIwidmLHvoElmhuDWS4jKKgYFPpITfcGWsGh6S2a3MM9WTB5qGjVF+0ArHFXA8jNDNgulN6vTW8z7dIgQXti+OD1Ro6L8vmPefV+3AGBZU+jRrLsqnqwn3MNrH4JdlslU+Zkxx9attEueK/jZSTAeqTU7+0XcKC/F5/sxIvbc8JC2/YTB9kFyEJdzm0zxhFvk2f2UEj49s31uZMijsIapz9VyAHW5sQ1dl53I0HNz8+u8JJprJyqN3ACzNgZNeT/aw+Svol9D0MfS/x417KJWzd5RyipidO9LrsS8Yt3V4qlxLR5K/a87awCR8ASUE/kZU8gg=
   file: build/*
   on:
     repo: Kaurin/megantory
-    branch: cicd
+    branch: master
     tags: true
