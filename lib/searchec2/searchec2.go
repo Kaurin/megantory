@@ -10,7 +10,7 @@ import (
 )
 
 // SearchProfilesRegions iterates provided profiles and regions and feeds the provided chan
-func SearchProfilesRegions(profiles []string, regionsServices map[string][]string, cResult chan<- common.Result, input string) {
+func SearchProfilesRegions(profiles []string, regionsServices map[string][]string, cResult chan<- common.Result, searchStr string) {
 	wg := sync.WaitGroup{}
 	defer close(cResult)
 	log.Infof("EC2: Started searching resources...")
@@ -42,9 +42,9 @@ func SearchProfilesRegions(profiles []string, regionsServices map[string][]strin
 			cfg.Region = region
 			client := ec2.New(cfg)
 			wg.Add(1)
-			go searchInstances(client, cResult, &wg, profile, input)
+			go searchInstances(client, cResult, &wg, profile, searchStr)
 			wg.Add(1)
-			go searchAddresses(client, cResult, &wg, profile, input)
+			go searchAddresses(client, cResult, &wg, profile, searchStr)
 		}
 	}
 	wg.Wait()

@@ -11,13 +11,13 @@ import (
 )
 
 // search searches single AWS EC2 region
-func searchInstances(client *ec2.Client, cResult chan<- common.Result, wg *sync.WaitGroup, profile, input string) {
+func searchInstances(client *ec2.Client, cResult chan<- common.Result, wg *sync.WaitGroup, profile, searchStr string) {
 	cInstances := make(chan *ec2.Instance)
 	go describeInstances(client, cInstances)
 	for instance := range cInstances { // Blocked until describeInstances closes chan
 		instanceLower := strings.ToLower(instance.String())
-		inputLower := strings.ToLower(input)
-		if strings.Contains(instanceLower, inputLower) {
+		searchStrLower := strings.ToLower(searchStr)
+		if strings.Contains(instanceLower, searchStrLower) {
 			result := common.Result{
 				Account:      profile,
 				Region:       client.Region,

@@ -11,13 +11,13 @@ import (
 )
 
 // searchAddresses searches single AWS EC2 region
-func searchAddresses(client *ec2.Client, cResult chan<- common.Result, wg *sync.WaitGroup, profile, input string) {
+func searchAddresses(client *ec2.Client, cResult chan<- common.Result, wg *sync.WaitGroup, profile, searchStr string) {
 	cAddresses := make(chan *ec2.Address)
 	go describeAddresses(client, profile, cAddresses)
 	for address := range cAddresses {
 		addressLower := strings.ToLower(address.String())
-		inputLower := strings.ToLower(input)
-		if strings.Contains(addressLower, inputLower) {
+		searchStrLower := strings.ToLower(searchStr)
+		if strings.Contains(addressLower, searchStrLower) {
 			result := common.Result{
 				Account:      profile,
 				Region:       client.Region,
