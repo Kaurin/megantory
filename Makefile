@@ -25,26 +25,32 @@ lint:
 blinux:
 	mkdir -p build
 	GOOS=linux go build -mod vendor \
-		-ldflags "-X main.buildHash=$(buildHash)" \
-		-ldflags "-X main.buildVersion=$(buildVersion)" \
-		-ldflags "-X main.buildDate=$(buildDate)" \
-			-o build/megantory.linux
+		-ldflags "\
+			-X main.buildHash=$(buildHash) \
+			-X main.buildVersion=$(buildVersion) \
+			-X main.buildDate=$(buildDate)\
+		" \
+		-o build/megantory.linux
 
 bmacos:
 	mkdir -p build
 	GOOS=darwin go build -mod vendor \
-		-ldflags "-X main.buildHash=$(buildHash)" \
-		-ldflags "-X main.buildVersion=$(buildVersion)" \
-		-ldflags "-X main.buildDate=$(buildDate)" \
-			-o build/megantory.macos
+		-ldflags "\
+			-X main.buildHash=$(buildHash) \
+			-X main.buildVersion=$(buildVersion) \
+			-X main.buildDate=$(buildDate)\
+		" \
+		-o build/megantory.macos
 
 bwindows:
 	mkdir -p build
 	GOOS=windows go build -mod vendor \
-		-ldflags "-X main.buildHash=$(buildHash)" \
-		-ldflags "-X main.buildVersion=$(buildVersion)" \
-		-ldflags "-X main.buildDate=$(buildDate)" \
-			-o build/megantory.exe
+		-ldflags "\
+			-X main.buildHash=$(buildHash) \
+			-X main.buildVersion=$(buildVersion) \
+			-X main.buildDate=$(buildDate)\
+		" \
+		-o build/megantory.exe
 
 build: blinux bmacos bwindows
 
