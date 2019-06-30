@@ -36,6 +36,7 @@ func Search(searchStr string) {
 	parentWg.Add(1)
 	go searchProfilesRegions(si, fSvcs)
 
+	parentWg.Add(1)
 	go func() {
 		for result := range cResults {
 			fmt.Println(common.BreadCrumbs(
@@ -45,6 +46,7 @@ func Search(searchStr string) {
 				result.ResourceType,
 				result.ResourceID))
 		}
+		parentWg.Done()
 	}()
 	parentWg.Wait()
 }
