@@ -41,7 +41,7 @@ func describeAddresses(client *ec2.Client, profile string, c chan<- *ec2.Address
 	req := client.DescribeAddressesRequest(input)
 	addresses, err := req.Send(context.TODO())
 	if err != nil {
-		checkAwsErrors(profile, reqType, client.Client, err)
+		common.CheckAwsErrors(profile, reqType, client.Client, err)
 		return
 	}
 

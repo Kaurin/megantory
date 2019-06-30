@@ -4,8 +4,6 @@ import (
 	"sync"
 
 	"github.com/Kaurin/megantory/lib/common"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	log "github.com/sirupsen/logrus"
@@ -50,23 +48,4 @@ func SearchProfilesRegions(profiles []string, regionsServices map[string][]strin
 		}
 	}
 	wg.Wait()
-}
-
-func checkAwsErrors(profile, reqType string, client *aws.Client, err error) error {
-	if aerr, ok := err.(awserr.Error); ok {
-		switch aerr.Code() {
-		default:
-			log.Warnf("Account: '%v'. Unable to request resource of type '%s' in region '%s': %v",
-				profile, reqType, client.Region, err)
-			return err
-		case "AuthFailure":
-			log.Warnf("Account: '%v'. Unable to request resource of type '%s'. You might need to enable region %s, or check your credentials. Recieved error: %v",
-				profile, reqType, client.Region, err)
-			return err
-		}
-	} else {
-		log.Warnf("Account: '%v'. Unable to request resource of type '%s' in region '%s': %v",
-			profile, reqType, client.Region, err)
-		return err
-	}
 }
