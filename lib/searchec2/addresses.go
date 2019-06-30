@@ -11,7 +11,7 @@ import (
 
 // searchAddresses searches single AWS EC2 region
 func searchAddresses(ec2i ec2Input) {
-	cAddresses := make(chan *ec2.Address)
+	cAddresses := make(chan ec2.Address)
 	go describeAddresses(ec2i.client, ec2i.profile, cAddresses)
 	for address := range cAddresses {
 		addressLower := strings.ToLower(address.String())
@@ -33,7 +33,7 @@ func searchAddresses(ec2i ec2Input) {
 }
 
 // describeAddresses Similar to describeInstances, but without pagination.
-func describeAddresses(client *ec2.Client, profile string, c chan<- *ec2.Address) {
+func describeAddresses(client *ec2.Client, profile string, c chan<- ec2.Address) {
 	defer close(c)
 	reqType := "ec2-address"
 	service := "ec2"
@@ -46,6 +46,6 @@ func describeAddresses(client *ec2.Client, profile string, c chan<- *ec2.Address
 		return
 	}
 	for _, address := range addresses.Addresses {
-		c <- &address
+		c <- address
 	}
 }
