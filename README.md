@@ -43,4 +43,4 @@ TODO
 
 [GoLang installation]: https://golang.org/doc/install
 [GoLang Environment Variables]: https://github.com/golang/go/wiki/SettingGOPATH
-[BuildPic]: https://travis-ci.com/Kaurin/megantory.svg?branch=master "Master build"
+[BuildPic]: https://travis-ci.org/Kaurin/megantory.svg?branch=master "Master build"
