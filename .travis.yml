@@ -16,4 +16,4 @@ deploy:
   - build/megantory.windows
   on:
     tags: true
-    condition: branch = master AND repo = "Kaurin/megantory" AND tag =~ /^v\n/
+    condition: 'branch = master AND repo = "Kaurin/megantory" AND tag =~ /^v\d/'
