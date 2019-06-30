@@ -14,7 +14,7 @@ func searchClusters(rdsi rdsInput) {
 	service := "rds"
 	resourceType := "rds-cluster"
 	bcr := common.BreadCrumbs(rdsi.profile, rdsi.region, service, resourceType)
-	cClusters := make(chan *rds.DBCluster)
+	cClusters := make(chan rds.DBCluster)
 	go describeClusters(rdsi.client, cClusters)
 	for cluster := range cClusters { // Blocked until describeClusters closes chan
 		clusterLower := strings.ToLower(cluster.String())
@@ -36,14 +36,14 @@ func searchClusters(rdsi rdsInput) {
 }
 
 // describeClusters wraps rds pagination for DescribeClusters
-func describeClusters(client *rds.Client, c chan<- *rds.DBCluster) {
+func describeClusters(client rds.Client, c chan<- rds.DBCluster) {
 	defer close(c)
 	input := &rds.DescribeDBClustersInput{}
 	req := client.DescribeDBClustersRequest(input)
 	p := rds.NewDescribeDBClustersPaginator(req)
 	for p.Next(context.TODO()) {
 		for _, cluster := range p.CurrentPage().DBClusters {
-			c <- &cluster
+			c <- cluster
 		}
 	}
 }

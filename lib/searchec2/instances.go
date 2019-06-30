@@ -14,7 +14,7 @@ func searchInstances(ec2i ec2Input) {
 	service := "ec2"
 	resourceType := "ec2-instance"
 	bcr := common.BreadCrumbs(ec2i.profile, ec2i.region, service, resourceType)
-	cInstances := make(chan *ec2.Instance)
+	cInstances := make(chan ec2.Instance)
 	go describeInstances(ec2i.client, cInstances)
 	for instance := range cInstances { // Blocked until describeInstances closes chan
 		instanceLower := strings.ToLower(instance.String())
@@ -36,7 +36,7 @@ func searchInstances(ec2i ec2Input) {
 }
 
 // describeInstances wraps ec2 pagination for DescribeInstances
-func describeInstances(client *ec2.Client, c chan<- *ec2.Instance) {
+func describeInstances(client ec2.Client, c chan<- ec2.Instance) {
 	defer close(c)
 	input := &ec2.DescribeInstancesInput{}
 	req := client.DescribeInstancesRequest(input)
@@ -44,7 +44,7 @@ func describeInstances(client *ec2.Client, c chan<- *ec2.Instance) {
 	for p.Next(context.TODO()) {
 		for _, runInstancesOutput := range p.CurrentPage().Reservations {
 			for _, instance := range runInstancesOutput.Instances {
-				c <- &instance
+				c <- instance
 			}
 		}
 	}

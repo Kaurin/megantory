@@ -10,7 +10,7 @@ import (
 type funcResources []func(rdsInput)
 
 type rdsInput struct {
-	client    *rds.Client
+	client    rds.Client
 	parentWg  *sync.WaitGroup
 	profile   string
 	searchStr string
@@ -31,7 +31,7 @@ func Search(ssi common.SubSearchInput) {
 	client := rds.New(ssi.Config)
 	for _, f := range fResources {
 		rdsi := rdsInput{
-			client:    client,
+			client:    *client,
 			parentWg:  &wg,
 			profile:   ssi.Profile,
 			searchStr: ssi.SearchStr,
