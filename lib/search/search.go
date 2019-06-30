@@ -17,7 +17,7 @@ type funcsServices []func(common.SubSearchInput)
 // Search searches all accounts and all supported services in all regions
 func Search(searchStr string) {
 	cResults := make(chan common.Result, 100) // Not sure how big the buffer should be
-	defer close(cResults)
+	cPrint := make(chan struct{})
 	parentWg := sync.WaitGroup{}
 	si := common.SearchInput{
 		CResults:         cResults,
@@ -36,7 +36,6 @@ func Search(searchStr string) {
 	parentWg.Add(1)
 	go searchProfilesRegions(si, fSvcs)
 
-	parentWg.Add(1)
 	go func() {
 		for result := range cResults {
 			fmt.Println(common.BreadCrumbs(
@@ -46,9 +45,12 @@ func Search(searchStr string) {
 				result.ResourceType,
 				result.ResourceID))
 		}
-		parentWg.Done()
+		cPrint <- struct{}{}
 	}()
 	parentWg.Wait()
+	close(cResults)
+	<-cPrint
+
 }
 
 // SearchProfilesRegions iterates provided profiles and regions and feeds the provided chan
