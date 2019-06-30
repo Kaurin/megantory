@@ -1,6 +1,8 @@
 package common
 
 import (
+	"sync"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	log "github.com/sirupsen/logrus"
@@ -14,6 +16,15 @@ type Result struct {
 	ResourceType string
 	ResourceID   string
 	ResourceJSON string
+}
+
+// SearchInput is a struct that carries the input params towards the service-specific search functions
+type SearchInput struct {
+	Profiles         []string
+	RegionsVServices map[string][]string
+	CResults         chan Result
+	SearchStr        string
+	ParentWg         *sync.WaitGroup
 }
 
 // Regions - Provided a map of regionsServices, this returns a slice of regions

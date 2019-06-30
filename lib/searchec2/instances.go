@@ -3,7 +3,6 @@ package searchec2
 import (
 	"context"
 	"strings"
-	"sync"
 
 	"github.com/Kaurin/megantory/lib/common"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -11,26 +10,26 @@ import (
 )
 
 // search searches single AWS EC2 region
-func searchInstances(client *ec2.Client, cResult chan<- common.Result, wg *sync.WaitGroup, profile, searchStr string) {
+func searchInstances(ssi subSearchInput) {
 	cInstances := make(chan *ec2.Instance)
-	go describeInstances(client, cInstances)
+	go describeInstances(ssi.client, cInstances)
 	for instance := range cInstances { // Blocked until describeInstances closes chan
 		instanceLower := strings.ToLower(instance.String())
-		searchStrLower := strings.ToLower(searchStr)
+		searchStrLower := strings.ToLower(ssi.searchStr)
 		if strings.Contains(instanceLower, searchStrLower) {
 			result := common.Result{
-				Account:      profile,
-				Region:       client.Region,
+				Account:      ssi.profile,
+				Region:       ssi.client.Region,
 				Service:      "ec2",
 				ResourceType: "ec2-instance",
 				ResourceID:   *instance.InstanceId,
 				ResourceJSON: instance.String(),
 			}
 			log.Debugln("EC2: Matched an instance, sending back to the results channel.")
-			cResult <- result
+			ssi.cResult <- result
 		}
 	}
-	wg.Done()
+	ssi.parentWg.Done()
 }
 
 // describeInstances wraps ec2 pagination for DescribeInstances

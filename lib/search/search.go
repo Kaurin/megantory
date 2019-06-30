@@ -2,6 +2,7 @@ package search
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/Kaurin/megantory/lib/common"
 	"github.com/Kaurin/megantory/lib/searchec2"
@@ -16,16 +17,19 @@ var regionsServices map[string][]string
 
 // Search searches all accounts and all supported services in all regions
 func Search(searchStr string) {
-	profiles = detectProfiles()
-	regionsServices = getAllRegions()
+	cResults := make(chan common.Result, 100) // Not sure how big the buffer should be
+	parentWg := sync.WaitGroup{}
+	searchInput := common.SearchInput{
+		CResults:         cResults,
+		Profiles:         detectProfiles(),
+		RegionsVServices: getRegionsVServices(),
+		SearchStr:        searchStr,
+		ParentWg:         &parentWg,
+	}
 	log.Infoln("Starting the Search LIB")
-	searchEc2(searchStr)
-}
+	parentWg.Add(1) // "Done" signal sent at child
+	go searchec2.SearchProfilesRegions(searchInput)
 
-func searchEc2(searchStr string) {
-	log.Infoln("Calling the EC2 search library")
-	cResults := make(chan common.Result)
-	go searchec2.SearchProfilesRegions(profiles, regionsServices, cResults, searchStr)
 	for result := range cResults {
 		fmt.Printf("%s // %s // %s // %s // %s\n",
 			result.Account,
@@ -34,4 +38,5 @@ func searchEc2(searchStr string) {
 			result.ResourceType,
 			result.ResourceID)
 	}
+	parentWg.Wait()
 }

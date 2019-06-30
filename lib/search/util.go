@@ -45,8 +45,8 @@ func detectProfiles() []string {
 	return profs
 }
 
-// getAllRegions -- Keys are region names. Each key has a slice of supported services
-func getAllRegions() map[string][]string {
+// getRegionsVServices -- Keys are region names. Each key has a slice of supported services
+func getRegionsVServices() map[string][]string {
 	log.Debugln("Grabbing the map of service availability accross regions from the AWS SDK V2")
 	resolver := endpoints.NewDefaultResolver()
 	partitions := resolver.Partitions()
