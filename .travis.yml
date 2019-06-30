@@ -13,6 +13,6 @@ deploy:
   file:
   - build/megantory.linux
   - build/megantory.macos
-  - build/megantory.windows
+  - build/megantory.exe
   on:
     tags: true

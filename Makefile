@@ -44,7 +44,7 @@ bwindows:
 		-ldflags "-X main.buildHash=$(buildHash)" \
 		-ldflags "-X main.buildVersion=$(buildVersion)" \
 		-ldflags "-X main.buildDate=$(buildDate)" \
-			-o build/megantory.windows
+			-o build/megantory.exe
 
 build: blinux bmacos bwindows
 
