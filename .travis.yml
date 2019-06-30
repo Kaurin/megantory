@@ -14,6 +14,5 @@ deploy:
   - build/megantory.linux
   - build/megantory.macos
   - build/megantory.windows
-  if: 'branch = master AND repo = "Kaurin/megantory" AND tag =~ /^v\d/'
   on:
     tags: true
