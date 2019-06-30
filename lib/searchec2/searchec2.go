@@ -4,62 +4,44 @@ import (
 	"sync"
 
 	"github.com/Kaurin/megantory/lib/common"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	log "github.com/sirupsen/logrus"
 )
 
-type subSearchInput struct {
+type funcResources []func(ec2Input)
+
+type ec2Input struct {
 	client    *ec2.Client
-	cResult   chan common.Result
 	parentWg  *sync.WaitGroup
 	profile   string
 	searchStr string
+	region    string
+	cResult   chan common.Result
 }
 
-// SearchProfilesRegions iterates provided profiles and regions and feeds the provided chan
-func SearchProfilesRegions(searchInput common.SearchInput) {
+// Search through all supported EC2 resource types
+func Search(ssi common.SubSearchInput) {
+	if !common.ServiceInRegion(ssi.RegionsVServices, ssi.Profile, ssi.Region, "ec2") {
+		ssi.ParentWg.Done()
+		return
+	}
 	wg := sync.WaitGroup{}
-	log.Infof("EC2: Started searching resources...")
-	regions := common.Regions(searchInput.RegionsVServices)
-	for _, profile := range searchInput.Profiles {
-		cfg, err := external.LoadDefaultAWSConfig(
-			external.WithSharedConfigProfile(profile),
-		)
-		if err != nil {
-			log.Errorf("unable to load config: %v... Skipping...", err)
-			continue
+	fResources := funcResources{
+		searchInstances,
+		searchAddresses,
+	}
+	client := ec2.New(ssi.Config)
+	for _, f := range fResources {
+		ec2i := ec2Input{
+			client:    client,
+			parentWg:  &wg,
+			profile:   ssi.Profile,
+			searchStr: ssi.SearchStr,
+			region:    ssi.Region,
+			cResult:   ssi.CResult,
 		}
-		log.Debugf("EC2: Loaded '%s' profile...", profile)
-		for _, region := range regions {
-			// Don't handle a search if a region doesn't support the EC2 service
-			foundServiceInRegion := false
-			for _, service := range searchInput.RegionsVServices[region] {
-				if service == "ec2" {
-					foundServiceInRegion = true
-					break
-				}
-			}
-			if !foundServiceInRegion {
-				log.Warnf("EC2: Region '%v' does not support this service. Skipping...", region)
-				continue
-			}
-			log.Tracef("EC2: Currently searching region: %v", region)
-			// Proceed with search
-			cfg.Region = region
-			client := ec2.New(cfg)
-			subSearchInput := subSearchInput{
-				client:    client,
-				cResult:   searchInput.CResults,
-				parentWg:  &wg,
-				searchStr: searchInput.SearchStr,
-			}
-			wg.Add(1)
-			go searchInstances(subSearchInput)
-			wg.Add(1)
-			go searchAddresses(subSearchInput)
-		}
+		wg.Add(1)
+		go f(ec2i)
 	}
 	wg.Wait()
-	searchInput.ParentWg.Done()
+	ssi.ParentWg.Done()
 }

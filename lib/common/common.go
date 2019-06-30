@@ -1,6 +1,7 @@
 package common
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -27,47 +28,61 @@ type SearchInput struct {
 	ParentWg         *sync.WaitGroup
 }
 
-// Regions - Provided a map of regionsServices, this returns a slice of regions
-func Regions(regionsServices map[string][]string) []string {
-	regions := []string{}
-	for region := range regionsServices {
-		regions = append(regions, region)
-	}
-	return regions
+// SubSearchInput is a struct that carries the input params towards the resource-specific search functions
+type SubSearchInput struct {
+	RegionsVServices map[string][]string
+	Config           aws.Config
+	CResult          chan Result
+	ParentWg         *sync.WaitGroup
+	Profile          string
+	Region           string
+	SearchStr        string
 }
 
-// CheckAwsErrors handles most types of errors
-// Example from the searchec2 package (addresses):
-//
-//		// func describeAddresses(client *ec2.Client, profile string, c chan<- *ec2.Address) {
-//		// 	defer close(c)
-//		// 	reqType := "address"
-//		// 	input := &ec2.DescribeAddressesInput{}
-//		// 	req := client.DescribeAddressesRequest(input)
-//		// 	addresses, err := req.Send(context.TODO())
-//		// 	if err != nil {
-//		// 		checkAwsErrors(profile, reqType, client.Client, err)
-//		// 		return
-//		// 	}
-//		// 	for _, address := range addresses.Addresses {
-//		// 		c <- &address
-//		// 	}
-//		// }
-func CheckAwsErrors(profile, reqType string, client *aws.Client, err error) error {
+// CheckAwsErrors is meant to handle AWS errors
+func CheckAwsErrors(bcr, reqType string, client *aws.Client, err error) {
 	if aerr, ok := err.(awserr.Error); ok {
 		switch aerr.Code() {
 		default:
-			log.Warnf("Account: '%v'. Unable to request resource of type '%s' in region '%s': %v",
-				profile, reqType, client.Region, err)
-			return err
+			log.Warnf("%s: Unable to request resource of type '%s': %s",
+				bcr, reqType, err.Error())
 		case "AuthFailure":
-			log.Warnf("Account: '%v'. Unable to request resource of type '%s'. You might need to enable region %s, or check your credentials. Recieved error: %v",
-				profile, reqType, client.Region, err)
-			return err
+			log.Warnf("%s: Unable to request resource of type '%s' You might need to enable this region, or check your credentials. Recieved error: %s",
+				bcr, reqType, err.Error())
 		}
 	} else {
-		log.Warnf("Account: '%v'. Unable to request resource of type '%s' in region '%s': %v",
-			profile, reqType, client.Region, err)
-		return err
+		log.Warnf("%s: Unable to request resource of type '%s': %s",
+			bcr, reqType, err.Error())
 	}
+}
+
+// BreadCrumbs Creates a breadcrumb  string for log prefixing based on a variadic number of input strings
+// profilename // region // service // resource
+// or
+// profilename
+// or
+// profilename // region
+func BreadCrumbs(inputs ...string) string {
+	if len(inputs) < 1 {
+		log.Fatalf("BreadCrumbs function recieved less than 1 string element. This should never happen. Debug the code.")
+	}
+	return strings.Join(inputs, " // ")
+}
+
+// ServiceInRegion - returns false if service not supported in region.
+func ServiceInRegion(regionsVServices map[string][]string, profile, region, service string) bool {
+	// Don't handle a search if a region doesn't support the service
+	bcr := BreadCrumbs(profile, region, service)
+	foundServiceInRegion := false
+	for _, service := range regionsVServices[region] {
+		if service == service {
+			foundServiceInRegion = true
+			break
+		}
+	}
+	if !foundServiceInRegion {
+		log.Warnf("%s: Region '%v' does not support this service. Skipping...", bcr, region)
+		return false
+	}
+	return true
 }

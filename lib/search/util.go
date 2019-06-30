@@ -65,3 +65,12 @@ func getRegionsVServices() map[string][]string {
 	}
 	return regs
 }
+
+// regionsF - Provided a map of regionsServices, this returns a slice of regions
+func regionsF(regionsServices map[string][]string) []string {
+	regions := []string{}
+	for region := range regionsServices {
+		regions = append(regions, region)
+	}
+	return regions
+}

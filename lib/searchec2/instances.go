@@ -9,27 +9,30 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// search searches single AWS EC2 region
-func searchInstances(ssi subSearchInput) {
+// searchInstances searches single AWS EC2 region
+func searchInstances(ec2i ec2Input) {
+	service := "ec2"
+	resourceType := "ec2-instance"
+	bcr := common.BreadCrumbs(ec2i.profile, ec2i.region, service, resourceType)
 	cInstances := make(chan *ec2.Instance)
-	go describeInstances(ssi.client, cInstances)
+	go describeInstances(ec2i.client, cInstances)
 	for instance := range cInstances { // Blocked until describeInstances closes chan
 		instanceLower := strings.ToLower(instance.String())
-		searchStrLower := strings.ToLower(ssi.searchStr)
+		searchStrLower := strings.ToLower(ec2i.searchStr)
 		if strings.Contains(instanceLower, searchStrLower) {
 			result := common.Result{
-				Account:      ssi.profile,
-				Region:       ssi.client.Region,
-				Service:      "ec2",
-				ResourceType: "ec2-instance",
+				Account:      ec2i.profile,
+				Region:       ec2i.region,
+				Service:      service,
+				ResourceType: resourceType,
 				ResourceID:   *instance.InstanceId,
 				ResourceJSON: instance.String(),
 			}
-			log.Debugln("EC2: Matched an instance, sending back to the results channel.")
-			ssi.cResult <- result
+			log.Debugf("%s: Matched an instance, sending back to the results channel.", bcr)
+			ec2i.cResult <- result
 		}
 	}
-	ssi.parentWg.Done()
+	ec2i.parentWg.Done()
 }
 
 // describeInstances wraps ec2 pagination for DescribeInstances

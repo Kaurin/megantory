@@ -10,37 +10,39 @@ import (
 )
 
 // searchAddresses searches single AWS EC2 region
-func searchAddresses(ssi subSearchInput) {
+func searchAddresses(ec2i ec2Input) {
 	cAddresses := make(chan *ec2.Address)
-	go describeAddresses(ssi.client, ssi.profile, cAddresses)
+	go describeAddresses(ec2i.client, ec2i.profile, cAddresses)
 	for address := range cAddresses {
 		addressLower := strings.ToLower(address.String())
-		searchStrLower := strings.ToLower(ssi.searchStr)
+		searchStrLower := strings.ToLower(ec2i.searchStr)
 		if strings.Contains(addressLower, searchStrLower) {
 			result := common.Result{
-				Account:      ssi.profile,
-				Region:       ssi.client.Region,
+				Account:      ec2i.profile,
+				Region:       ec2i.region,
 				Service:      "ec2",
 				ResourceType: "ec2-address",
 				ResourceID:   *address.AllocationId,
 				ResourceJSON: address.String(),
 			}
 			log.Debugln("EC2: Matched an address, sending back to the results channel.")
-			ssi.cResult <- result
+			ec2i.cResult <- result
 		}
 	}
-	ssi.parentWg.Done()
+	ec2i.parentWg.Done()
 }
 
 // describeAddresses Similar to describeInstances, but without pagination.
 func describeAddresses(client *ec2.Client, profile string, c chan<- *ec2.Address) {
 	defer close(c)
-	reqType := "address"
+	reqType := "ec2-address"
+	service := "ec2"
+	bcr := common.BreadCrumbs(profile, client.Region, service, reqType)
 	input := &ec2.DescribeAddressesInput{}
 	req := client.DescribeAddressesRequest(input)
 	addresses, err := req.Send(context.TODO())
 	if err != nil {
-		common.CheckAwsErrors(profile, reqType, client.Client, err)
+		common.CheckAwsErrors(bcr, reqType, client.Client, err)
 		return
 	}
 	for _, address := range addresses.Addresses {
