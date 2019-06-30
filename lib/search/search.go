@@ -50,7 +50,6 @@ func Search(searchStr string) {
 	parentWg.Wait()
 	close(cResults)
 	<-cPrint
-
 }
 
 // SearchProfilesRegions iterates provided profiles and regions and feeds the provided chan
