@@ -12,6 +12,8 @@ Search **all** your configured AWS profiles - FAST
 * EC2
   * Address (EIP)
   * Instance
+* RDS
+  * Cluster (Aurora)
 
 This list should be expanded as the project grows
 
