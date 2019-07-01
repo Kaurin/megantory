@@ -3,6 +3,7 @@ go:
 - 1.12.6
 env:
 - GO111MODULE=on
+after_success: test -n "$TRAVIS_TAG" && make bmacos bwindows
 deploy:
   provider: releases
   overwrite: true
