@@ -3,6 +3,7 @@ package searchec2
 import (
 	"context"
 	"strings"
+	"sync"
 
 	"github.com/Kaurin/megantory/lib/common"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -11,24 +12,31 @@ import (
 
 // searchAddresses searches single AWS EC2 region
 func searchAddresses(ec2i ec2Input) {
+	wg := sync.WaitGroup{}
 	cAddresses := make(chan ec2.Address)
 	go describeAddresses(ec2i.client, ec2i.profile, cAddresses)
-	for address := range cAddresses {
-		addressLower := strings.ToLower(address.String())
-		searchStrLower := strings.ToLower(ec2i.searchStr)
-		if strings.Contains(addressLower, searchStrLower) {
-			result := common.Result{
-				Account:      ec2i.profile,
-				Region:       ec2i.region,
-				Service:      "ec2",
-				ResourceType: "ec2-address",
-				ResourceID:   *address.AllocationId,
-				ResourceJSON: address.String(),
+	for addressL := range cAddresses {
+		address := addressL
+		wg.Add(1)
+		go func() {
+			addressLower := strings.ToLower(address.String())
+			searchStrLower := strings.ToLower(ec2i.searchStr)
+			if strings.Contains(addressLower, searchStrLower) {
+				result := common.Result{
+					Account:      ec2i.profile,
+					Region:       ec2i.region,
+					Service:      "ec2",
+					ResourceType: "ec2-address",
+					ResourceID:   *address.AllocationId,
+					ResourceJSON: address.String(),
+				}
+				log.Debugln("EC2: Matched an address, sending back to the results channel.")
+				ec2i.cResult <- result
 			}
-			log.Debugln("EC2: Matched an address, sending back to the results channel.")
-			ec2i.cResult <- result
-		}
+			wg.Done()
+		}()
 	}
+	wg.Wait()
 	ec2i.parentWg.Done()
 }
 
