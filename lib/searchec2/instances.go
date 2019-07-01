@@ -18,7 +18,7 @@ func searchInstances(ec2i ec2Input) {
 	bcr := common.BreadCrumbs(ec2i.profile, ec2i.region, service, resourceType)
 	cInstances := make(chan ec2.Instance)
 	go describeInstances(ec2i.client, cInstances)
-	for instanceL := range cInstances { // Blocked until describeInstances closes chan
+	for instanceL := range cInstances {
 		instance := instanceL
 		wg.Add(1)
 		go func() {
@@ -33,7 +33,7 @@ func searchInstances(ec2i ec2Input) {
 					ResourceID:   *instance.InstanceId,
 					ResourceJSON: instance.String(),
 				}
-				log.Debugf("%s: Matched an instance, sending back to the results channel.", bcr)
+				log.Debugf("%s: Matched an %s, sending back to the results channel.", bcr, resourceType)
 				ec2i.cResult <- result
 			}
 			wg.Done()

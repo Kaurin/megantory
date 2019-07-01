@@ -18,7 +18,7 @@ func searchClusters(rdsi rdsInput) {
 	bcr := common.BreadCrumbs(rdsi.profile, rdsi.region, service, resourceType)
 	cClusters := make(chan rds.DBCluster)
 	go describeClusters(rdsi.client, cClusters)
-	for clusterL := range cClusters { // Blocked until describeClusters closes chan
+	for clusterL := range cClusters {
 		cluster := clusterL
 		wg.Add(1)
 		go func() {
@@ -33,7 +33,7 @@ func searchClusters(rdsi rdsInput) {
 					ResourceID:   *cluster.DBClusterIdentifier,
 					ResourceJSON: cluster.String(),
 				}
-				log.Debugf("%s: Matched a cluster, sending back to the results channel.", bcr)
+				log.Debugf("%s: Matched an %s, sending back to the results channel.", bcr, resourceType)
 				rdsi.cResult <- result
 			}
 			wg.Done()

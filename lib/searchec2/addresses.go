@@ -13,6 +13,9 @@ import (
 // searchAddresses searches single AWS EC2 region
 func searchAddresses(ec2i ec2Input) {
 	wg := sync.WaitGroup{}
+	service := "ec2"
+	resourceType := "ec2-address"
+	bcr := common.BreadCrumbs(ec2i.profile, ec2i.region, service, resourceType)
 	cAddresses := make(chan ec2.Address)
 	go describeAddresses(ec2i.client, ec2i.profile, cAddresses)
 	for addressL := range cAddresses {
@@ -25,12 +28,12 @@ func searchAddresses(ec2i ec2Input) {
 				result := common.Result{
 					Account:      ec2i.profile,
 					Region:       ec2i.region,
-					Service:      "ec2",
-					ResourceType: "ec2-address",
+					Service:      service,
+					ResourceType: resourceType,
 					ResourceID:   *address.AllocationId,
 					ResourceJSON: address.String(),
 				}
-				log.Debugln("EC2: Matched an address, sending back to the results channel.")
+				log.Debugf("%s: Matched an %s, sending back to the results channel.", bcr, resourceType)
 				ec2i.cResult <- result
 			}
 			wg.Done()
