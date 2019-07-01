@@ -2,7 +2,7 @@ buildHash := $(shell git rev-parse HEAD)
 buildVersion := $(shell git describe --tags)
 buildDate := $(shell date -u -Iseconds)
 
-all: clean prep lint test build
+all: clean prep lint test blinux
 
 clean:
 	rm -rf vendor
