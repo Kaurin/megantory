@@ -46,21 +46,15 @@ func searchInstances(ec2i ec2Input) {
 
 // describeInstances wraps ec2 pagination for DescribeInstances
 func describeInstances(client ec2.Client, c chan<- ec2.Instance) {
-	wg := sync.WaitGroup{}
 	defer close(c)
 	input := &ec2.DescribeInstancesInput{}
 	req := client.DescribeInstancesRequest(input)
 	p := ec2.NewDescribeInstancesPaginator(req)
 	for p.Next(context.TODO()) {
-		wg.Add(1)
-		go func() {
-			for _, runInstancesOutput := range p.CurrentPage().Reservations {
-				for _, instance := range runInstancesOutput.Instances {
-					c <- instance
-				}
+		for _, runInstancesOutput := range p.CurrentPage().Reservations {
+			for _, instance := range runInstancesOutput.Instances {
+				c <- instance
 			}
-			wg.Done()
-		}()
+		}
 	}
-	wg.Wait()
 }
