@@ -36,6 +36,7 @@ func searchInstances(ec2i ec2Input) {
 				log.Debugf("%s: Matched an instance, sending back to the results channel.", bcr)
 				ec2i.cResult <- result
 			}
+			wg.Done()
 		}()
 
 	}
@@ -53,15 +54,12 @@ func describeInstances(client ec2.Client, c chan<- ec2.Instance) {
 	for p.Next(context.TODO()) {
 		wg.Add(1)
 		go func() {
-			for _, runInstancesOutputL := range p.CurrentPage().Reservations {
-				runInstancesOutput := runInstancesOutputL
-				wg.Add(1)
-				go func() {
-					for _, instance := range runInstancesOutput.Instances {
-						c <- instance
-					}
-				}()
+			for _, runInstancesOutput := range p.CurrentPage().Reservations {
+				for _, instance := range runInstancesOutput.Instances {
+					c <- instance
+				}
 			}
+			wg.Done()
 		}()
 	}
 	wg.Wait()
