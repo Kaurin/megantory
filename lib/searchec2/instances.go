@@ -36,7 +36,7 @@ func searchInstances(ec2i ec2Input) {
 }
 
 // describeInstances wraps ec2 pagination for DescribeInstances
-func describeInstances(client *ec2.Client, c chan<- ec2.Instance) {
+func describeInstances(client ec2.Client, c chan<- ec2.Instance) {
 	defer close(c)
 	input := &ec2.DescribeInstancesInput{}
 	req := client.DescribeInstancesRequest(input)

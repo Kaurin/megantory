@@ -33,7 +33,7 @@ func searchAddresses(ec2i ec2Input) {
 }
 
 // describeAddresses Similar to describeInstances, but without pagination.
-func describeAddresses(client *ec2.Client, profile string, c chan<- ec2.Address) {
+func describeAddresses(client ec2.Client, profile string, c chan<- ec2.Address) {
 	defer close(c)
 	reqType := "ec2-address"
 	service := "ec2"

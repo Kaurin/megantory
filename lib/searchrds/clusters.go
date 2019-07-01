@@ -36,7 +36,7 @@ func searchClusters(rdsi rdsInput) {
 }
 
 // describeClusters wraps rds pagination for DescribeClusters
-func describeClusters(client *rds.Client, c chan<- rds.DBCluster) {
+func describeClusters(client rds.Client, c chan<- rds.DBCluster) {
 	defer close(c)
 	input := &rds.DescribeDBClustersInput{}
 	req := client.DescribeDBClustersRequest(input)

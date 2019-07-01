@@ -10,7 +10,7 @@ import (
 type funcResources []func(ec2Input)
 
 type ec2Input struct {
-	client    *ec2.Client
+	client    ec2.Client
 	parentWg  *sync.WaitGroup
 	profile   string
 	searchStr string
@@ -32,7 +32,7 @@ func Search(ssi common.SubSearchInput) {
 	client := ec2.New(ssi.Config)
 	for _, f := range fResources {
 		ec2i := ec2Input{
-			client:    client,
+			client:    *client,
 			parentWg:  &wg,
 			profile:   ssi.Profile,
 			searchStr: ssi.SearchStr,
