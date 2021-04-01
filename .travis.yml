@@ -1,7 +1,6 @@
 language: go
 go:
 - 1.16.2
-env:
 after_success: test -n "$TRAVIS_TAG" && make bmacos bwindows
 deploy:
   provider: releases
