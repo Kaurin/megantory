@@ -28,6 +28,7 @@ func Search(ssi common.SubSearchInput) {
 	fResources := funcResources{
 		searchInstances,
 		searchAddresses,
+		searchEnis,
 	}
 	client := ec2.New(ssi.Config)
 	for _, f := range fResources {
